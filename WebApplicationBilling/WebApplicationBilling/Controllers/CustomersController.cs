@@ -68,26 +68,33 @@ namespace WebApplicationBilling.Controllers
                 return View();
             }
         }
-
+        
         // GET: CustomersController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int? id)
         {
-            return View();
+
+            var customer = new CustomerDTO();
+
+            customer = await _customerRepository.GetByIdAsync(UrlResources.UrlCustomers, id.GetValueOrDefault());
+            if (customer == null)
+            {
+                return NotFound();
+         
+            }
+            return View(customer);
         }
 
         // POST: CustomersController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Edit(CustomerDTO customer)
         {
-            try
+            if (ModelState.IsValid)
             {
+                await _customerRepository.UpdateAsync(UrlResources.UrlBase + customer.id, customer);
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+            return View();
         }
 
         // GET: CustomersController/Delete/5
